@@ -21,16 +21,8 @@ registerRoute(({ request, url }) => {
 
 // Cache runtime assets like the Unsplash images and music files!
 registerRoute(
-  ({ url }) => url.origin === self.location.origin || url.pathname.endsWith('.mp3') || url.pathname.endsWith('.jpg'),
-  new CacheFirst({ // <-- Changed from StaleWhileRevalidate to CacheFirst
-    cacheName: 'music-player-media',
-    plugins: [
-      new ExpirationPlugin({ 
-        maxEntries: 50,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 days
-      }),
-    ],
-  })
+  ({ url }) => url.pathname.endsWith('.mp3'),
+  new NetworkOnly() // <-- This streams songs normally without heavy caching!
 );
 
 self.addEventListener('message', (event) => {
