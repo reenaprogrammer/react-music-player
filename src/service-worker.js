@@ -3,7 +3,7 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { CacheFirst } from 'workbox-strategies';
 
 clientsClaim();
 
@@ -22,10 +22,13 @@ registerRoute(({ request, url }) => {
 // Cache runtime assets like the Unsplash images and music files!
 registerRoute(
   ({ url }) => url.origin === self.location.origin || url.pathname.endsWith('.mp3') || url.pathname.endsWith('.jpg'),
-  new StaleWhileRevalidate({
+  new CacheFirst({ // <-- Changed from StaleWhileRevalidate to CacheFirst
     cacheName: 'music-player-media',
     plugins: [
-      new ExpirationPlugin({ maxEntries: 50 }),
+      new ExpirationPlugin({ 
+        maxEntries: 50,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 days
+      }),
     ],
   })
 );
